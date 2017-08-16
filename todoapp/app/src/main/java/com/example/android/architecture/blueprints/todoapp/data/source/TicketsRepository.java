@@ -40,14 +40,14 @@ public class TicketsRepository implements TicketsDataSource {
 
     private static TicketsRepository INSTANCE = null;
 
-    private final TicketsDataSource mTasksRemoteDataSource;
+    private final TicketsDataSource mTicketsRemoteDataSource;
 
-    private final TicketsDataSource mTasksLocalDataSource;
+    private final TicketsDataSource mTicketLocalDataSource;
 
     /**
      * This variable has package local visibility so it can be accessed from tests.
      */
-    Map<String, Ticket> mCachedTasks;
+    Map<String, Ticket> mCachedTickets;
 
     /**
      * Marks the cache as invalid, to force an update the next time data is requested. This variable
@@ -58,8 +58,8 @@ public class TicketsRepository implements TicketsDataSource {
     // Prevent direct instantiation.
     private TicketsRepository(@NonNull TicketsDataSource tasksRemoteDataSource,
                               @NonNull TicketsDataSource tasksLocalDataSource) {
-        mTasksRemoteDataSource = checkNotNull(tasksRemoteDataSource);
-        mTasksLocalDataSource = checkNotNull(tasksLocalDataSource);
+        mTicketsRemoteDataSource = checkNotNull(tasksRemoteDataSource);
+        mTicketLocalDataSource = checkNotNull(tasksLocalDataSource);
     }
 
     /**
@@ -97,8 +97,8 @@ public class TicketsRepository implements TicketsDataSource {
         checkNotNull(callback);
 
         // Respond immediately with cache if available and not dirty
-        if (mCachedTasks != null && !mCacheIsDirty) {
-            callback.onTicketsLoaded(new ArrayList<>(mCachedTasks.values()));
+        if (mCachedTickets != null && !mCacheIsDirty) {
+            callback.onTicketsLoaded(new ArrayList<>(mCachedTickets.values()));
             return;
         }
 
@@ -107,11 +107,11 @@ public class TicketsRepository implements TicketsDataSource {
             getTasksFromRemoteDataSource(callback);
         } else {
             // Query the local storage if available. If not, query the network.
-            mTasksLocalDataSource.getTickets(new LoadTicketsCallback() {
+            mTicketLocalDataSource.getTickets(new LoadTicketsCallback() {
                 @Override
                 public void onTicketsLoaded(List<Ticket> tickets) {
                     refreshCache(tickets);
-                    callback.onTicketsLoaded(new ArrayList<>(mCachedTasks.values()));
+                    callback.onTicketsLoaded(new ArrayList<>(mCachedTickets.values()));
                 }
 
                 @Override
@@ -125,29 +125,29 @@ public class TicketsRepository implements TicketsDataSource {
     @Override
     public void saveTicket(@NonNull Ticket ticket) {
         checkNotNull(ticket);
-        mTasksRemoteDataSource.saveTicket(ticket);
-        mTasksLocalDataSource.saveTicket(ticket);
+        mTicketsRemoteDataSource.saveTicket(ticket);
+        mTicketLocalDataSource.saveTicket(ticket);
 
         // Do in memory cache update to keep the app UI up to date
-        if (mCachedTasks == null) {
-            mCachedTasks = new LinkedHashMap<>();
+        if (mCachedTickets == null) {
+            mCachedTickets = new LinkedHashMap<>();
         }
-        mCachedTasks.put(ticket.getId(), ticket);
+        mCachedTickets.put(ticket.getId(), ticket);
     }
 
     @Override
     public void completeTicket(@NonNull Ticket ticket) {
         checkNotNull(ticket);
-        mTasksRemoteDataSource.completeTicket(ticket);
-        mTasksLocalDataSource.completeTicket(ticket);
+        mTicketsRemoteDataSource.completeTicket(ticket);
+        mTicketLocalDataSource.completeTicket(ticket);
 
         Ticket completedTicket = new Ticket(ticket.getTitle(), ticket.getDescription(), ticket.getId(), true);
 
         // Do in memory cache update to keep the app UI up to date
-        if (mCachedTasks == null) {
-            mCachedTasks = new LinkedHashMap<>();
+        if (mCachedTickets == null) {
+            mCachedTickets = new LinkedHashMap<>();
         }
-        mCachedTasks.put(ticket.getId(), completedTicket);
+        mCachedTickets.put(ticket.getId(), completedTicket);
     }
 
     @Override
@@ -159,16 +159,16 @@ public class TicketsRepository implements TicketsDataSource {
     @Override
     public void activateTicket(@NonNull Ticket ticket) {
         checkNotNull(ticket);
-        mTasksRemoteDataSource.activateTicket(ticket);
-        mTasksLocalDataSource.activateTicket(ticket);
+        mTicketsRemoteDataSource.activateTicket(ticket);
+        mTicketLocalDataSource.activateTicket(ticket);
 
         Ticket activeTicket = new Ticket(ticket.getTitle(), ticket.getDescription(), ticket.getId());
 
         // Do in memory cache update to keep the app UI up to date
-        if (mCachedTasks == null) {
-            mCachedTasks = new LinkedHashMap<>();
+        if (mCachedTickets == null) {
+            mCachedTickets = new LinkedHashMap<>();
         }
-        mCachedTasks.put(ticket.getId(), activeTicket);
+        mCachedTickets.put(ticket.getId(), activeTicket);
     }
 
     @Override
@@ -179,14 +179,14 @@ public class TicketsRepository implements TicketsDataSource {
 
     @Override
     public void clearCompletedTickets() {
-        mTasksRemoteDataSource.clearCompletedTickets();
-        mTasksLocalDataSource.clearCompletedTickets();
+        mTicketsRemoteDataSource.clearCompletedTickets();
+        mTicketLocalDataSource.clearCompletedTickets();
 
         // Do in memory cache update to keep the app UI up to date
-        if (mCachedTasks == null) {
-            mCachedTasks = new LinkedHashMap<>();
+        if (mCachedTickets == null) {
+            mCachedTickets = new LinkedHashMap<>();
         }
-        Iterator<Map.Entry<String, Ticket>> it = mCachedTasks.entrySet().iterator();
+        Iterator<Map.Entry<String, Ticket>> it = mCachedTickets.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, Ticket> entry = it.next();
             if (entry.getValue().isCompleted()) {
@@ -218,27 +218,27 @@ public class TicketsRepository implements TicketsDataSource {
         // Load from server/persisted if needed.
 
         // Is the task in the local data source? If not, query the network.
-        mTasksLocalDataSource.getTicket(taskId, new GetTicketCallback() {
+        mTicketLocalDataSource.getTicket(taskId, new GetTicketCallback() {
             @Override
             public void onTicketLoaded(Ticket ticket) {
                 // Do in memory cache update to keep the app UI up to date
-                if (mCachedTasks == null) {
-                    mCachedTasks = new LinkedHashMap<>();
+                if (mCachedTickets == null) {
+                    mCachedTickets = new LinkedHashMap<>();
                 }
-                mCachedTasks.put(ticket.getId(), ticket);
+                mCachedTickets.put(ticket.getId(), ticket);
                 callback.onTicketLoaded(ticket);
             }
 
             @Override
             public void onDataNotAvailable() {
-                mTasksRemoteDataSource.getTicket(taskId, new GetTicketCallback() {
+                mTicketsRemoteDataSource.getTicket(taskId, new GetTicketCallback() {
                     @Override
                     public void onTicketLoaded(Ticket ticket) {
                         // Do in memory cache update to keep the app UI up to date
-                        if (mCachedTasks == null) {
-                            mCachedTasks = new LinkedHashMap<>();
+                        if (mCachedTickets == null) {
+                            mCachedTickets = new LinkedHashMap<>();
                         }
-                        mCachedTasks.put(ticket.getId(), ticket);
+                        mCachedTickets.put(ticket.getId(), ticket);
                         callback.onTicketLoaded(ticket);
                     }
 
@@ -258,30 +258,30 @@ public class TicketsRepository implements TicketsDataSource {
 
     @Override
     public void deleteAllTickets() {
-        mTasksRemoteDataSource.deleteAllTickets();
-        mTasksLocalDataSource.deleteAllTickets();
+        mTicketsRemoteDataSource.deleteAllTickets();
+        mTicketLocalDataSource.deleteAllTickets();
 
-        if (mCachedTasks == null) {
-            mCachedTasks = new LinkedHashMap<>();
+        if (mCachedTickets == null) {
+            mCachedTickets = new LinkedHashMap<>();
         }
-        mCachedTasks.clear();
+        mCachedTickets.clear();
     }
 
     @Override
     public void deleteTicket(@NonNull String taskId) {
-        mTasksRemoteDataSource.deleteTicket(checkNotNull(taskId));
-        mTasksLocalDataSource.deleteTicket(checkNotNull(taskId));
+        mTicketsRemoteDataSource.deleteTicket(checkNotNull(taskId));
+        mTicketLocalDataSource.deleteTicket(checkNotNull(taskId));
 
-        mCachedTasks.remove(taskId);
+        mCachedTickets.remove(taskId);
     }
 
     private void getTasksFromRemoteDataSource(@NonNull final LoadTicketsCallback callback) {
-        mTasksRemoteDataSource.getTickets(new LoadTicketsCallback() {
+        mTicketsRemoteDataSource.getTickets(new LoadTicketsCallback() {
             @Override
             public void onTicketsLoaded(List<Ticket> tickets) {
                 refreshCache(tickets);
                 refreshLocalDataSource(tickets);
-                callback.onTicketsLoaded(new ArrayList<>(mCachedTasks.values()));
+                callback.onTicketsLoaded(new ArrayList<>(mCachedTickets.values()));
             }
 
             @Override
@@ -292,30 +292,30 @@ public class TicketsRepository implements TicketsDataSource {
     }
 
     private void refreshCache(List<Ticket> tickets) {
-        if (mCachedTasks == null) {
-            mCachedTasks = new LinkedHashMap<>();
+        if (mCachedTickets == null) {
+            mCachedTickets = new LinkedHashMap<>();
         }
-        mCachedTasks.clear();
+        mCachedTickets.clear();
         for (Ticket ticket : tickets) {
-            mCachedTasks.put(ticket.getId(), ticket);
+            mCachedTickets.put(ticket.getId(), ticket);
         }
         mCacheIsDirty = false;
     }
 
     private void refreshLocalDataSource(List<Ticket> tickets) {
-        mTasksLocalDataSource.deleteAllTickets();
+        mTicketLocalDataSource.deleteAllTickets();
         for (Ticket ticket : tickets) {
-            mTasksLocalDataSource.saveTicket(ticket);
+            mTicketLocalDataSource.saveTicket(ticket);
         }
     }
 
     @Nullable
     private Ticket getTaskWithId(@NonNull String id) {
         checkNotNull(id);
-        if (mCachedTasks == null || mCachedTasks.isEmpty()) {
+        if (mCachedTickets == null || mCachedTickets.isEmpty()) {
             return null;
         } else {
-            return mCachedTasks.get(id);
+            return mCachedTickets.get(id);
         }
     }
 }
