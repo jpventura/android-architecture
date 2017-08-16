@@ -19,22 +19,22 @@ package com.example.android.architecture.blueprints.todoapp;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TicketsLocalDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.TicketsDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.remote.TicketsRemoteDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.TicketsRepository;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Enables injection of production implementations for
- * {@link TasksDataSource} at compile time.
+ * {@link TicketsDataSource} at compile time.
  */
 public class Injection {
 
-    public static TasksRepository provideTasksRepository(@NonNull Context context) {
+    public static TicketsRepository provideTicketsRepository(@NonNull Context context) {
         checkNotNull(context);
-        return TasksRepository.getInstance(TasksRemoteDataSource.getInstance(),
-                TasksLocalDataSource.getInstance(context));
+        return TicketsRepository.getInstance(TicketsRemoteDataSource.getInstance(),
+                TicketsLocalDataSource.getInstance(context));
     }
 }

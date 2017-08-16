@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, The Android Open Source Project
+ * Copyright (C) 2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.statistics;
+package com.example.android.architecture.blueprints.todoapp.tickets;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.NavUtils;
+import android.support.test.espresso.IdlingResource;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -28,26 +30,27 @@ import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
+import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
-/**
- * Show statistics for tasks.
- */
-public class StatisticsActivity extends AppCompatActivity {
+public class TicketsActivity extends AppCompatActivity {
+
+    private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
 
     private DrawerLayout mDrawerLayout;
+
+    private TicketsPresenter mTicketsPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.statistics_act);
+        setContentView(R.layout.tasks_act);
 
         // Set up the toolbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
-        ab.setTitle(R.string.statistics_title);
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
 
@@ -59,16 +62,32 @@ public class StatisticsActivity extends AppCompatActivity {
             setupDrawerContent(navigationView);
         }
 
-        StatisticsFragment statisticsFragment = (StatisticsFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.contentFrame);
-        if (statisticsFragment == null) {
-            statisticsFragment = StatisticsFragment.newInstance();
-            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    statisticsFragment, R.id.contentFrame);
+        TicketsFragment ticketsFragment =
+                (TicketsFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+        if (ticketsFragment == null) {
+            // Create the fragment
+            ticketsFragment = TicketsFragment.newInstance();
+            ActivityUtils.addFragmentToActivity(
+                    getSupportFragmentManager(), ticketsFragment, R.id.contentFrame);
         }
 
-        new StatisticsPresenter(
-                Injection.provideTicketsRepository(getApplicationContext()), statisticsFragment);
+        // Create the presenter
+        mTicketsPresenter = new TicketsPresenter(
+                Injection.provideTicketsRepository(getApplicationContext()), ticketsFragment);
+
+        // Load previously saved state, if available.
+        if (savedInstanceState != null) {
+            TicketsFilterType currentFiltering =
+                    (TicketsFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
+            mTicketsPresenter.setFiltering(currentFiltering);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable(CURRENT_FILTERING_KEY, mTicketsPresenter.getFiltering());
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -89,10 +108,12 @@ public class StatisticsActivity extends AppCompatActivity {
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
                             case R.id.list_navigation_menu_item:
-                                NavUtils.navigateUpFromSameTask(StatisticsActivity.this);
+                                // Do nothing, we're already on that screen
                                 break;
                             case R.id.statistics_navigation_menu_item:
-                                // Do nothing, we're already on that screen
+                                Intent intent =
+                                        new Intent(TicketsActivity.this, StatisticsActivity.class);
+                                startActivity(intent);
                                 break;
                             default:
                                 break;
@@ -103,5 +124,10 @@ public class StatisticsActivity extends AppCompatActivity {
                         return true;
                     }
                 });
+    }
+
+    @VisibleForTesting
+    public IdlingResource getCountingIdlingResource() {
+        return EspressoIdlingResource.getIdlingResource();
     }
 }

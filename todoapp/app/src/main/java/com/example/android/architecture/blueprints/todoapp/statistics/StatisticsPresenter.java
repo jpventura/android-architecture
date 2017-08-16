@@ -18,9 +18,9 @@ package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.support.annotation.NonNull;
 
-import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.data.Ticket;
+import com.example.android.architecture.blueprints.todoapp.data.source.TicketsDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.TicketsRepository;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 
 import java.util.List;
@@ -33,13 +33,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class StatisticsPresenter implements StatisticsContract.Presenter {
 
-    private final TasksRepository mTasksRepository;
+    private final TicketsRepository mTicketsRepository;
 
     private final StatisticsContract.View mStatisticsView;
 
-    public StatisticsPresenter(@NonNull TasksRepository tasksRepository,
+    public StatisticsPresenter(@NonNull TicketsRepository tasksRepository,
                                @NonNull StatisticsContract.View statisticsView) {
-        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
+        mTicketsRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         mStatisticsView = checkNotNull(statisticsView, "StatisticsView cannot be null!");
 
         mStatisticsView.setPresenter(this);
@@ -57,11 +57,11 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
         // that the app is busy until the response is handled.
         EspressoIdlingResource.increment(); // App is busy until further notice
 
-        mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
+        mTicketsRepository.getTickets(new TicketsDataSource.LoadTicketsCallback() {
             @Override
-            public void onTasksLoaded(List<Task> tasks) {
-                int activeTasks = 0;
-                int completedTasks = 0;
+            public void onTicketsLoaded(List<Ticket> tickets) {
+                int activeTickets = 0;
+                int completedTickets = 0;
 
                 // This callback may be called twice, once for the cache and once for loading
                 // the data from the server API, so we check before decrementing, otherwise
@@ -70,12 +70,12 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
                     EspressoIdlingResource.decrement(); // Set app as idle.
                 }
 
-                // We calculate number of active and completed tasks
-                for (Task task : tasks) {
-                    if (task.isCompleted()) {
-                        completedTasks += 1;
+                // We calculate number of active and completed tickets
+                for (Ticket ticket : tickets) {
+                    if (ticket.isCompleted()) {
+                        completedTickets += 1;
                     } else {
-                        activeTasks += 1;
+                        activeTickets += 1;
                     }
                 }
                 // The view may not be able to handle UI updates anymore
@@ -84,7 +84,7 @@ public class StatisticsPresenter implements StatisticsContract.Presenter {
                 }
                 mStatisticsView.setProgressIndicator(false);
 
-                mStatisticsView.showStatistics(activeTasks, completedTasks);
+                mStatisticsView.showStatistics(activeTickets, completedTickets);
             }
 
             @Override

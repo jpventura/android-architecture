@@ -19,23 +19,23 @@ package com.example.android.architecture.blueprints.todoapp;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.example.android.architecture.blueprints.todoapp.data.FakeTasksRemoteDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.FakeTicketsRemoteDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.TicketsDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.TicketsRepository;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TicketsLocalDataSource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Enables injection of mock implementations for
- * {@link TasksDataSource} at compile time. This is useful for testing, since it allows us to use
+ * {@link TicketsDataSource} at compile time. This is useful for testing, since it allows us to use
  * a fake instance of the class to isolate the dependencies and run a test hermetically.
  */
 public class Injection {
 
-    public static TasksRepository provideTasksRepository(@NonNull Context context) {
+    public static TicketsRepository provideTicketsRepository(@NonNull Context context) {
         checkNotNull(context);
-        return TasksRepository.getInstance(FakeTasksRemoteDataSource.getInstance(),
-                TasksLocalDataSource.getInstance(context));
+        return TicketsRepository.getInstance(FakeTicketsRemoteDataSource.getInstance(),
+                TicketsLocalDataSource.getInstance(context));
     }
 }

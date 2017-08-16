@@ -16,9 +16,9 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.data.Ticket;
+import com.example.android.architecture.blueprints.todoapp.data.source.TicketsDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.TicketsRepository;
 import com.google.common.collect.Lists;
 
 import org.junit.Before;
@@ -38,10 +38,10 @@ import static org.mockito.Mockito.when;
  */
 public class StatisticsPresenterTest {
 
-    private static List<Task> TASKS;
+    private static List<Ticket> Tickets;
 
     @Mock
-    private TasksRepository mTasksRepository;
+    private TicketsRepository mTicketsRepository;
 
     @Mock
     private StatisticsContract.View mStatisticsView;
@@ -51,7 +51,7 @@ public class StatisticsPresenterTest {
      * perform further actions or assertions on them.
      */
     @Captor
-    private ArgumentCaptor<TasksDataSource.LoadTasksCallback> mLoadTasksCallbackCaptor;
+    private ArgumentCaptor<TicketsDataSource.LoadTicketsCallback> mLoadTicketsCallbackCaptor;
 
 
     private StatisticsPresenter mStatisticsPresenter;
@@ -63,39 +63,39 @@ public class StatisticsPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mStatisticsPresenter = new StatisticsPresenter(mTasksRepository, mStatisticsView);
+        mStatisticsPresenter = new StatisticsPresenter(mTicketsRepository, mStatisticsView);
 
         // The presenter won't update the view unless it's active.
         when(mStatisticsView.isActive()).thenReturn(true);
 
         // We start the tasks to 3, with one active and two completed
-        TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
-                new Task("Title2", "Description2", true), new Task("Title3", "Description3", true));
+        Tickets = Lists.newArrayList(new Ticket("Title1", "Description1"),
+                new Ticket("Title2", "Description2", true), new Ticket("Title3", "Description3", true));
     }
 
     @Test
     public void createPresenter_setsThePresenterToView() {
         // Get a reference to the class under test
-        mStatisticsPresenter = new StatisticsPresenter(mTasksRepository, mStatisticsView);
+        mStatisticsPresenter = new StatisticsPresenter(mTicketsRepository, mStatisticsView);
 
         // Then the presenter is set to the view
         verify(mStatisticsView).setPresenter(mStatisticsPresenter);
     }
 
     @Test
-    public void loadEmptyTasksFromRepository_CallViewToDisplay() {
+    public void loadEmptyTicketsFromRepository_CallViewToDisplay() {
         // Given an initialized StatisticsPresenter with no tasks
-        TASKS.clear();
+        Tickets.clear();
 
-        // When loading of Tasks is requested
+        // When loading of Tickets is requested
         mStatisticsPresenter.start();
 
         //Then progress indicator is shown
         verify(mStatisticsView).setProgressIndicator(true);
 
         // Callback is captured and invoked with stubbed tasks
-        verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
-        mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
+        verify(mTicketsRepository).getTickets(mLoadTicketsCallbackCaptor.capture());
+        mLoadTicketsCallbackCaptor.getValue().onTicketsLoaded(Tickets);
 
         // Then progress indicator is hidden and correct data is passed on to the view
         verify(mStatisticsView).setProgressIndicator(false);
@@ -103,18 +103,18 @@ public class StatisticsPresenterTest {
     }
 
     @Test
-    public void loadNonEmptyTasksFromRepository_CallViewToDisplay() {
+    public void loadNonEmptyTicketsFromRepository_CallViewToDisplay() {
         // Given an initialized StatisticsPresenter with 1 active and 2 completed tasks
 
-        // When loading of Tasks is requested
+        // When loading of Tickets is requested
         mStatisticsPresenter.start();
 
         //Then progress indicator is shown
         verify(mStatisticsView).setProgressIndicator(true);
 
         // Callback is captured and invoked with stubbed tasks
-        verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
-        mLoadTasksCallbackCaptor.getValue().onTasksLoaded(TASKS);
+        verify(mTicketsRepository).getTickets(mLoadTicketsCallbackCaptor.capture());
+        mLoadTicketsCallbackCaptor.getValue().onTicketsLoaded(Tickets);
 
         // Then progress indicator is hidden and correct data is passed on to the view
         verify(mStatisticsView).setProgressIndicator(false);
@@ -122,13 +122,13 @@ public class StatisticsPresenterTest {
     }
 
     @Test
-    public void loadStatisticsWhenTasksAreUnavailable_CallErrorToDisplay() {
+    public void loadStatisticsWhenTicketsAreUnavailable_CallErrorToDisplay() {
         // When statistics are loaded
         mStatisticsPresenter.start();
 
         // And tasks data isn't available
-        verify(mTasksRepository).getTasks(mLoadTasksCallbackCaptor.capture());
-        mLoadTasksCallbackCaptor.getValue().onDataNotAvailable();
+        verify(mTicketsRepository).getTickets(mLoadTicketsCallbackCaptor.capture());
+        mLoadTicketsCallbackCaptor.getValue().onDataNotAvailable();
 
         // Then an error message is shown
         verify(mStatisticsView).showLoadingStatisticsError();
