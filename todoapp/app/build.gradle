@@ -69,6 +69,7 @@ dependencies {
     compile "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
     compile "com.android.support:support-v4:$rootProject.supportLibraryVersion"
     compile "com.android.support.test.espresso:espresso-idling-resource:$rootProject.espressoVersion"
+    compile "com.google.android.gms:play-services-base:$rootProject.googlePlayVersion"
     compile "com.google.guava:guava:$rootProject.guavaVersion"
 
     // Dependencies for local unit tests
