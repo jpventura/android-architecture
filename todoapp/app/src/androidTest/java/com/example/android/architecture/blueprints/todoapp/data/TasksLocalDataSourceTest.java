@@ -24,7 +24,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksData
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDbHelper;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
-import com.example.android.architecture.blueprints.todoapp.util.schedulers.TrampolineSchedulerProvider;
+import com.example.android.architecture.blueprints.todoapp.util.schedulers.TestSchedulerProvider;
 
 import org.junit.After;
 import org.junit.Before;
@@ -61,7 +61,7 @@ public class TasksLocalDataSourceTest {
     @Before
     public void setup() {
         TasksLocalDataSource.destroyInstance();
-        mSchedulerProvider = new TrampolineSchedulerProvider();
+        mSchedulerProvider = new TestSchedulerProvider();
 
         mLocalDataSource = TasksLocalDataSource.getInstance(
                 InstrumentationRegistry.getTargetContext(), mSchedulerProvider);
