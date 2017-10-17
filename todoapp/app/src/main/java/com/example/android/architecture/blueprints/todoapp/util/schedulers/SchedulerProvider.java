@@ -3,9 +3,9 @@ package com.example.android.architecture.blueprints.todoapp.util.schedulers;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import rx.Scheduler;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Provides different types of schedulers.
@@ -43,4 +43,5 @@ public class SchedulerProvider implements BaseSchedulerProvider {
     public Scheduler ui() {
         return AndroidSchedulers.mainThread();
     }
+
 }
