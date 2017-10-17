@@ -8,7 +8,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * Implementation of the {@link BaseSchedulerProvider} making all {@link Scheduler}s immediate.
  */
-public class ImmediateSchedulerProvider implements BaseSchedulerProvider {
+public class TrampolineSchedulerProvider implements BaseSchedulerProvider {
 
     @NonNull
     @Override

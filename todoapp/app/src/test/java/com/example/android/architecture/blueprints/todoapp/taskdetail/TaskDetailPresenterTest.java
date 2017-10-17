@@ -19,7 +19,7 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
-import com.example.android.architecture.blueprints.todoapp.util.schedulers.ImmediateSchedulerProvider;
+import com.example.android.architecture.blueprints.todoapp.util.schedulers.TrampolineSchedulerProvider;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -65,7 +65,7 @@ public class TaskDetailPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         // Make the sure that all schedulers are immediate.
-        mSchedulerProvider = new ImmediateSchedulerProvider();
+        mSchedulerProvider = new TrampolineSchedulerProvider();
 
         // The presenter won't update the view unless it's active.
         when(mTaskDetailView.isActive()).thenReturn(true);

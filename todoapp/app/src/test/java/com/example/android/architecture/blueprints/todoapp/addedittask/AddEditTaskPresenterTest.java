@@ -19,7 +19,7 @@ package com.example.android.architecture.blueprints.todoapp.addedittask;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
-import com.example.android.architecture.blueprints.todoapp.util.schedulers.ImmediateSchedulerProvider;
+import com.example.android.architecture.blueprints.todoapp.util.schedulers.TrampolineSchedulerProvider;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -59,7 +59,7 @@ public class AddEditTaskPresenterTest {
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
 
-        mSchedulerProvider = new ImmediateSchedulerProvider();
+        mSchedulerProvider = new TrampolineSchedulerProvider();
 
         // The presenter wont't update the view unless it's active.
         when(mAddEditTaskView.isActive()).thenReturn(true);

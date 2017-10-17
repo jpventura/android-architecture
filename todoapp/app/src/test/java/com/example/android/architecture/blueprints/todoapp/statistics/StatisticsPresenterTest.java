@@ -19,7 +19,7 @@ package com.example.android.architecture.blueprints.todoapp.statistics;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
-import com.example.android.architecture.blueprints.todoapp.util.schedulers.ImmediateSchedulerProvider;
+import com.example.android.architecture.blueprints.todoapp.util.schedulers.TrampolineSchedulerProvider;
 import com.google.common.collect.Lists;
 
 import org.junit.Before;
@@ -58,7 +58,7 @@ public class StatisticsPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         // Make the sure that all schedulers are immediate.
-        mSchedulerProvider = new ImmediateSchedulerProvider();
+        mSchedulerProvider = new TrampolineSchedulerProvider();
 
         // Get a reference to the class under test
         mStatisticsPresenter = new StatisticsPresenter(mTasksRepository, mStatisticsView,
