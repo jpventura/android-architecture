@@ -23,7 +23,9 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 
-import rx.subscriptions.CompositeSubscription;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -48,7 +50,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
     private boolean mIsDataMissing;
 
     @NonNull
-    private CompositeSubscription mSubscriptions;
+    private Disposable mDisposables;
 
     /**
      * Creates a presenter for the add/edit view.
@@ -68,7 +70,7 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
 
         mSchedulerProvider = checkNotNull(schedulerProvider, "schedulerProvider cannot be null!");
 
-        mSubscriptions = new CompositeSubscription();
+        mDisposables = new CompositeDisposable();
         mAddTaskView.setPresenter(this);
     }
 
@@ -98,6 +100,10 @@ public class AddEditTaskPresenter implements AddEditTaskContract.Presenter {
         if (isNewTask()) {
             throw new RuntimeException("populateTask() was called but task is new.");
         }
+
+        mTasksRepository.getTask(mTaskId)
+                .subscribeOn(Schedulers.io())
+                .observeOn()
         mSubscriptions.add(mTasksRepository
                 .getTask(mTaskId)
                 .subscribeOn(mSchedulerProvider.computation())

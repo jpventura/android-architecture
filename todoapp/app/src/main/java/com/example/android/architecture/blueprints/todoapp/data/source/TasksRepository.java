@@ -28,10 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import rx.Observable;
-import rx.functions.Action0;
-import rx.functions.Action1;
-import rx.functions.Func1;
+import io.reactivex.Observable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -105,7 +102,8 @@ public class TasksRepository implements TasksDataSource {
     public Observable<List<Task>> getTasks() {
         // Respond immediately with cache if available and not dirty
         if (mCachedTasks != null && !mCacheIsDirty) {
-            return Observable.from(mCachedTasks.values()).toList();
+            Observable.
+            return return Observable.just(mCachedTasks.values());
         } else if (mCachedTasks == null) {
             mCachedTasks = new LinkedHashMap<>();
         }
